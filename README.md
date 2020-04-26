@@ -20,3 +20,15 @@ Available tweet categories are the followings:
 $$$$$<Tweet_Code_Here>
 ```
 Note that tweets should be in English.
+
+## Preprocessing
+Preprocessing steps which are applied to each tweet during the classifications are the followings:
+* Stemming
+* Removing usernames
+* Removing hashtags
+* Removing hyperlinks
+* Removing numeric characters
+* Removing punctuation
+* Removing single characters
+* Removing emojis
+* Removing English stop words
