@@ -19,3 +19,4 @@ Available tweet categories are the followings:
 <Tweet_HERE>
 $$$$$<Tweet_Code_Here>
 ```
+Note that tweets should be in English.
