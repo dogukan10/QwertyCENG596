@@ -1,9 +1,11 @@
+import nltk
 import numpy as np
-from keras import layers
+from keras.layers import Conv1D, Flatten, Dense
 from keras.models import Sequential
+from keras.optimizers import SGD
 from keras.preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
-import nltk
+
 from preprocessor import Preprocessor
 
 # download stopwords
@@ -55,19 +57,27 @@ tokenized_tweets_padding = pad_sequences(tokenized_tweets, maxlen=max_tokens)
 
 # Training params
 batch_size = 256
-num_epochs = 10
+num_epochs = 20
+num_class = 8
 
-input_dim = tokenized_tweets_padding.shape[1]
+# reshape the input since Conv1D expects three dimensional inputs
+tokenized_tweets_padding = tokenized_tweets_padding.reshape(tokenized_tweets_padding.shape[0],
+                                                            tokenized_tweets_padding.shape[1], 1)
 
 # Create CNN model
 model = Sequential()
+model.add(Conv1D(32, 3, input_shape=(tokenized_tweets_padding.shape[1], tokenized_tweets_padding.shape[2]),
+                 activation='relu'))
+model.add(Flatten())
+model.add(Dense(num_class, activation='softmax'))
 
-model.add(layers.Dense(25, input_dim=input_dim, activation='relu'))
-model.add(layers.Dense(8, activation='sigmoid'))
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
+model.compile(loss='sparse_categorical_crossentropy',
+              optimizer=sgd,
+              metrics=['sparse_categorical_accuracy'])
+
+model.summary()
 # run model
 model.fit(np.array(tokenized_tweets_padding), np.array(labels), batch_size=batch_size, epochs=num_epochs,
           validation_split=0.1,
