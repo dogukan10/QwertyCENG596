@@ -5,7 +5,8 @@ from keras.models import Sequential
 from keras.optimizers import SGD
 from keras.preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
-
+from  keras.utils import plot_model
+import matplotlib.pyplot as plt
 from preprocessor import Preprocessor
 
 # download stopwords
@@ -79,8 +80,30 @@ model.compile(loss='sparse_categorical_crossentropy',
 
 model.summary()
 # run model
-model.fit(np.array(tokenized_tweets_padding), np.array(labels), batch_size=batch_size, epochs=num_epochs,
+history = model.fit(np.array(tokenized_tweets_padding), np.array(labels), batch_size=batch_size, epochs=num_epochs,
           validation_split=0.1,
           shuffle=True, verbose=2)
+
+# Plot training & validation accuracy values
+plt.plot(history.history['sparse_categorical_accuracy'])
+plt.plot(history.history['val_sparse_categorical_accuracy'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+# Plot training & validation loss values
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
 # save model weights for the future
 model.save_weights('cnn.h5')
+
+# Plot the CNN model
+plot_model(model,to_file="model.png",show_layer_names=True,show_shapes=True)
