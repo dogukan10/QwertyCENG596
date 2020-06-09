@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <script src="../static/js/jquery-1.11.2.js"></script>
-    <script src="../static/js/retrieveLabel.js"></script>
+    <script src="../static/js/categoryScript.js"></script>
 
 </head>
 
@@ -18,10 +18,13 @@
                 <input type="text" name="tweet" id="tweet" class="form-control" placeholder="Please, type your tweet here" required>
             </form>
 
-            <button id="btn" class="btn btn-primary space-before" style="float:right">What's its category?</button>
+            <br>
+            <button id="btn" class="btn btn-primary" style="float:right">What's its category?</button>
 
             <div style="clear:both">
-                <label><b>Category Label:</b></label><span id="category"></span>
+                <label><b>Category Label For Naive Bayes:</b></label><span id="category-naive-bayes"></span><br>
+                <label><b>Category Label For CNN:</b></label><span id="category-cnn"></span><br>
+                <label><b>Category Label For KNN:</b></label><span id="category-knn"></span>
             </div>
 
         </div>
