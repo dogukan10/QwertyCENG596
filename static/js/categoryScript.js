@@ -8,7 +8,9 @@ $(function(){
 			type: 'POST',
 			success: function(response){
 				console.log(response);
-				$("#category").text(response['category']);
+				$("#category-naive-bayes").text(response['category-naive-bayes']);
+				$("#category-cnn").text(response['category-cnn']);
+				$("#category-knn").text(response['category-knn']);
 			},
 			error: function(error){
 				console.log(error);

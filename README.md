@@ -32,3 +32,7 @@ Preprocessing steps which are applied to each tweet during the classifications a
 * Removing single characters
 * Removing emojis
 * Removing English stop words
+
+## Web Application
+This project has a simple web application where you can check the category of the tweet.
+Once you run app.py, you can access web application on http://localhost:5000/
