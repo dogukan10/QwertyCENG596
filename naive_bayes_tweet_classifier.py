@@ -9,7 +9,7 @@ from naive_bayes import NaiveBayes
 
 class naive_bayes_tweet_classifier:
 
-    def train(self):
+    def __init__(self):
         # download stopwords
         nltk.download('stopwords')
 
@@ -58,7 +58,6 @@ class naive_bayes_tweet_classifier:
         self.nb = NaiveBayes()
         self.nb.fit(X_train, y_train)
 
-        return True
         # print("Accuracy", self.accuracy(y_test, predictions))
 
     def accuracy(self, y_true, y_pred):
@@ -67,7 +66,6 @@ class naive_bayes_tweet_classifier:
 
     def predict(self, tweet):
         tweets = [tweet]
-        self.tokenizer.fit_on_texts(tweets)
         tokenized_tweets = self.tokenizer.texts_to_sequences(tweets)
         tokenized_tweets_padding = pad_sequences(tokenized_tweets, maxlen=self.max_tokens)
         predictions = self.nb.predict(tokenized_tweets_padding)
