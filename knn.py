@@ -27,6 +27,53 @@ class KNN_NLC_Classifer():
     def __init__(self, k=1, distance_type = 'path'):
         self.k = k
         self.distance_type = distance_type
+        # download stopwords
+        nltk.download('stopwords')
+
+        # tweets and their labels
+        tweets = []
+        labels = []
+
+        # retrieve tweets
+        file = open("tweets.txt", "r")
+
+        # tweet to be added to the tweets list
+        tweet = ""
+        # line to be read from the file
+        line = file.readline()
+        while line:
+            #  if the line is the label, add tweet and its label to the corresponding lists
+            if line.startswith("$$$$$"):
+                # add tweet
+                tweets.append(tweet)
+                # add label
+                labels.append(int(line[5:].replace("\n", "")))
+                # clear tweet object
+                tweet = ""
+            #  else, the line is a part of the tweet
+            else:
+                tweet += line.replace("\n", "").strip().lower()
+            # read new line
+            line = file.readline()
+
+        # Preprocessing
+        preprocessor = Preprocessor(tweets, nltk.PorterStemmer())
+        tweets = preprocessor.start()
+
+        # Tokenize tweets
+        self.tokenizer = Tokenizer()
+        self.tokenizer.fit_on_texts(tweets)
+
+        tokenized_tweets = self.tokenizer.texts_to_sequences(tweets)
+        num_tokens = [len(tokens) for tokens in tokenized_tweets]
+        num_tokens = np.array(num_tokens)
+
+        self.max_tokens = int(np.mean(num_tokens) + 2 * np.std(num_tokens))
+
+        tokenized_tweets_padding = pad_sequences(tokenized_tweets, maxlen=self.max_tokens)
+        X_train, X_test, y_train, y_test = train_test_split(tokenized_tweets_padding, labels, test_size=0.2,
+                                                            random_state=123)
+        self.fit(X_train, y_train)
 
     # This function is used for training
     def fit(self, x_train, y_train):
@@ -36,20 +83,24 @@ class KNN_NLC_Classifer():
     # This function runs the K(1) nearest neighbour algorithm and
     # returns the label with closest match. 
     def predict(self, x_test):
-        self.x_test = x_test
+        x_test = [x_test]
+        tokenized_tweets = self.tokenizer.texts_to_sequences(x_test)
+        tokenized_tweets_padding = pad_sequences(tokenized_tweets, maxlen=self.max_tokens)
+
+        self.x_test = tokenized_tweets_padding
         y_predict = []
 
-        for i in range(len(x_test)):
+        for i in range(len(self.x_test)):
             max_sim = 1000000
             max_index = 0
             for j in range(self.x_train.shape[0]):
                 #temp = self.document_similarity(x_test[i], self.x_train[j])
-                temp = abs(np.sum(x_test[i]) - np.sum(self.x_train[j]))
+                temp = abs(np.sum(self.x_test[i]) - np.sum(self.x_train[j]))
                 if temp < max_sim:
                     max_sim = temp
                     max_index = j
             y_predict.append(self.y_train[max_index])
-        return y_predict
+        return y_predict[0]
 
     def similarity_score(self, s1, s2, distance_type = 'path'):
           """
@@ -81,7 +132,7 @@ class KNN_NLC_Classifer():
                   s1_largest_scores.append(max_score)
           
           mean_score = np.mean(s1_largest_scores)
-          '''        
+          '''
           return mean_score
 
     def document_similarity(self,doc1, doc2):
@@ -123,61 +174,10 @@ class KNN_NLC_Classifer():
         try:
             return tag_dict[tag[0]]
         except KeyError:
-            return None         
+            return None
+
 def accuracy(y_true, y_pred):
     accuracy = np.count_nonzero(np.asarray(y_true,dtype=np.float32)==np.asarray(y_pred,dtype=np.float32)) / len(y_true)
     return accuracy
 	
-# download stopwords
-nltk.download('stopwords')
-
-# tweets and their labels
-tweets = []
-labels = []
-
-# retrieve tweets
-file = open("tweets.txt", "r")
-
-# tweet to be added to the tweets list
-tweet = ""
-# line to be read from the file
-line = file.readline()
-while line:
-    #  if the line is the label, add tweet and its label to the corresponding lists
-    if line.startswith("$$$$$"):
-        # add tweet
-        tweets.append(tweet)
-        # add label
-        labels.append(int(line[5:].replace("\n", "")))
-        # clear tweet object
-        tweet = ""
-    #  else, the line is a part of the tweet
-    else:
-        tweet += line.replace("\n", "").strip().lower()
-    # read new line
-    line = file.readline()
-
-# Preprocessing
-preprocessor = Preprocessor(tweets, nltk.PorterStemmer())
-tweets = preprocessor.start()
-
-# Tokenize tweets
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(tweets)
-
-tokenized_tweets = tokenizer.texts_to_sequences(tweets)
-num_tokens = [len(tokens) for tokens in tokenized_tweets]
-num_tokens = np.array(num_tokens)
-
-max_tokens = int(np.mean(num_tokens) + 2 * np.std(num_tokens))
-
-tokenized_tweets_padding = pad_sequences(tokenized_tweets, maxlen=max_tokens)
-X_train, X_test, y_train, y_test = train_test_split(tokenized_tweets_padding, labels, test_size=0.2, random_state=123)
-
-print(X_train)
-kNN = KNN_NLC_Classifer()
-
-kNN.fit(X_train, y_train)
-predictions = kNN.predict(X_test)
-
-print("Accuracy", accuracy(y_test, predictions))
+# print("Accuracy", accuracy(y_test, predictions))
