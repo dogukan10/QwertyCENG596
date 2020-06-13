@@ -2,7 +2,7 @@ import nltk
 import numpy as np
 from keras.layers import Conv1D, Flatten, Dense
 from keras.models import Sequential
-from keras.optimizers import SGD
+from keras.optimizers import Adam
 from keras.preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
 from  keras.utils import plot_model
@@ -77,10 +77,10 @@ class cnn_classifier:
         self.model.add(Flatten())
         self.model.add(Dense(num_class, activation='softmax'))
 
-        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        opt = Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, decay=0.01)
 
         self.model.compile(loss='sparse_categorical_crossentropy',
-                           optimizer=sgd,
+                           optimizer=opt,
                            metrics=['sparse_categorical_accuracy'])
 
         self.model.summary()
